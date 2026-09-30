@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Business V1</title>
+<style>
+body{font-family:Arial,sans-serif;background:#111;color:#eee;margin:0;padding:20px}
+main{max-width:700px;margin:auto}
+.card{background:#1d1d1d;padding:20px;margin:15px 0;border-radius:14px}
+h1{margin-top:0}
+input,textarea,button{width:100%;box-sizing:border-box;padding:13px;margin:7px 0;border-radius:8px;font-size:16px}
+input,textarea{background:#292929;color:white;border:1px solid #555}
+button{background:#fff;color:#111;border:0;font-weight:bold}
+.badge{display:inline-block;background:#333;padding:7px 10px;border-radius:20px}
+.small{color:#aaa}
+</style>
+</head>
+
+<body>
+<main>
+
+<div class="card">
+<h1>AI Business V1</h1>
+<p class="badge">$25 Commercial Project Watch</p>
+<p class="small">Research + AI calling + sales + payment + revenue system</p>
+</div>
+
+<div class="card">
+<h2>Business Pipeline</h2>
+<ol>
+<li>Find a commercial prospect</li>
+<li>AI caller conducts discovery</li>
+<li>Research official project records</li>
+<li>Verify the information</li>
+<li>Offer the $25 report</li>
+<li>Receive payment</li>
+<li>Deliver report</li>
+<li>Record revenue and improve</li>
+</ol>
+</div>
+
+<div class="card">
+<h2>Prospect</h2>
+
+<label>Company</label>
+<input id="company" placeholder="Company name">
+
+<label>Contact</label>
+<input id="contact" placeholder="Contact name">
+
+<label>Phone</label>
+<input id="phone" placeholder="Phone number">
+
+<label>Notes</label>
+<textarea id="notes" rows="4"></textarea>
+
+<button onclick="saveProspect()">Save Prospect</button>
+<p id="saved" class="small"></p>
+</div>
+
+<div class="card">
+<h2>AI Caller</h2>
+
+<p><b>Opening:</b></p>
+
+<p>
+Hi, I'm an AI assistant calling on behalf of a small research service.
+We're testing a service that identifies newly filed Oklahoma City
+commercial projects that may create sales opportunities for sign companies.
+Do you have about three minutes for a few questions?
+</p>
+
+<p><b>Questions:</b></p>
+
+<ol>
+<li>How do you currently find new commercial construction or remodel projects?</li>
+<li>Do you monitor city permit or development records?</li>
+<li>Would a short verified list of relevant new projects be useful?</li>
+<li>What information would need to be on that list?</li>
+<li>Who should receive a $25 sample report?</li>
+</ol>
+
+<p class="small">
+The production caller will identify itself as AI and will not impersonate a person.
+</p>
+</div>
+
+<div class="card">
+<h2>Product</h2>
+<p><b>OKC Commercial Project Watch — First Report</b></p>
+<p>Price: <b>$25.00</b></p>
+<p class="small">
+Payment will be connected only after the owner authorizes the merchant account.
+</p>
+</div>
+
+<div class="card">
+<h2>Revenue</h2>
+<p>Sales: <b id="sales">$0</b></p>
+<p>Revenue: <b id="revenue">$0.00</b></p>
+<p class="small">First goal: one real $25 sale.</p>
+</div>
+
+</main>
+
+<script>
+function saveProspect(){
+  const prospect={
+    company:document.getElementById("company").value,
+    contact:document.getElementById("contact").value,
+    phone:document.getElementById("phone").value,
+    notes:document.getElementById("notes").value
+  };
+
+  localStorage.setItem(
+    "ai_business_prospect",
+    JSON.stringify(prospect)
+  );
+
+  document.getElementById("saved").textContent=
+    "Prospect saved on this device.";
+}
+</script>
+
+</body>
+  </html>
