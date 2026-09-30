@@ -1,0 +1,183 @@
+AI BUSINESS V1 — START HERE
+
+This is the first working prototype of your business.
+
+WHAT YOU ARE BUILDING
+Commercial Project Watch:
+A $25 research report that finds newly filed Oklahoma City commercial projects
+that may create opportunities for commercial sign companies.
+
+THE BUSINESS FLOW
+1. AI caller contacts a prospect.
+2. Caller asks a short set of discovery questions.
+3. We identify whether the prospect has a useful problem.
+4. We research official OKC records.
+5. We verify the findings.
+6. Customer receives a $25 checkout/payment request.
+7. We deliver the report.
+8. Revenue is recorded.
+9. If they want another report, we automate more.
+
+IMPORTANT
+You do NOT need to open a ZIP file to start using this.
+Open the files in this folder with a text/code editor.
+
+IF YOU ARE USING A CHROMEBOOK
+1. Download this folder/file package.
+2. The easiest immediate option is to use a browser-based code editor such as Replit,
+   or install/use a code editor that can open .js and .md files.
+3. The actual phone-calling and payment connections are NOT active yet.
+   They require your authorization and service accounts.
+
+FILES
+server.js = the business/API starter
+package.json = Node setup
+.env.example = settings template (no secrets)
+revenue_ledger.csv = revenue tracker
+research_report_template.md = customer report template
+README.md = project instructions
+
+NEXT BUILD STEP
+Connect the AI caller and payment checkout, then run the first prospect test.
+
+
+--- server.js ---
+const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+const PRODUCT = {
+  name: "OKC Commercial Project Watch — First Report",
+  priceCents: Number(process.env.PRODUCT_PRICE_CENTS || 2500),
+  currency: "usd"
+};
+
+const discoveryScript = {
+  opening:
+    "Hi, I'm an AI assistant calling on behalf of a small research service. I'm testing a service that identifies newly filed Oklahoma City commercial projects that may create sales opportunities for sign companies. Do you have about three minutes for a few questions?",
+  questions: [
+    "How do you currently find new commercial construction or remodel projects before they become obvious sales opportunities?",
+    "Do you currently monitor city permit or development records for projects that may need signage?",
+    "If someone gave you a short, verified list of relevant newly filed projects each week, would that fit into your sales process?",
+    "What information would have to be on the list for it to be useful to you?",
+    "Who is the right person to send a $25 sample report to?"
+  ],
+  rules: [
+    "Never claim to be a human.",
+    "Never claim a project is definitely buying signs unless verified.",
+    "Separate sourced facts from inference.",
+    "If the person is not responsible, ask who handles business development or estimating.",
+    "If asked for details you do not have, say you do not have them.",
+    "Do not pressure the prospect."
+  ]
+};
+
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true, product: PRODUCT.name });
+});
+
+app.get("/api/product", (req, res) => {
+  res.json(PRODUCT);
+});
+
+app.get("/api/caller-script", (req, res) => {
+  res.json(discoveryScript);
+});
+
+app.post("/api/leads", (req, res) => {
+  const { company, contact, phone, notes = "" } = req.body;
+  if (!company || !phone) {
+    return res.status(400).json({ error: "company and phone are required" });
+  }
+  // V1 intentionally keeps lead storage simple.
+  res.status(201).json({
+    status: "accepted",
+    lead: { company, contact, phone, notes }
+  });
+});
+
+app.post("/api/calls/outcome", (req, res) => {
+  const allowed = [
+    "interested",
+    "not_interested",
+    "already_has_source",
+    "wrong_person",
+    "callback",
+    "do_not_call",
+    "unknown"
+  ];
+  const { outcome, company, notes = "" } = req.body;
+  if (!allowed.includes(outcome)) {
+    return res.status(400).json({ error: "invalid outcome" });
+  }
+  res.json({
+    saved: true,
+    company,
+    outcome,
+    notes,
+    next:
+      outcome === "interested"
+        ? "Send $25 checkout and create research task."
+        : "Do not charge. Preserve notes for later analysis."
+  });
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`AI Business V1 running on http://localhost:${process.env.PORT || 3000}`);
+});
+
+
+--- package.json ---
+{
+  "name": "ai-business-v1",
+  "version": "0.1.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
+
+
+--- .env.example ---
+OPENAI_API_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+PORT=3000
+PRODUCT_PRICE_CENTS=2500
+BUSINESS_NAME=Commercial Project Watch
+
+
+--- research_report_template.md ---
+# OKC Commercial Project Watch
+## Client
+[Company]
+
+## Report date
+[Date]
+
+## Projects
+
+### 1. [Project / Address]
+**Source:** [official record URL/reference]
+**Filed/updated:** [date]
+**Record type:** [permit/application/etc.]
+**Sourced facts:**
+- [fact]
+- [fact]
+
+**Why it may matter to a sign company:**
+- [clearly labeled inference]
+
+**Confidence:** [High / Medium / Low]
+
+## Verification notes
+- [what was checked]
+- [what could not be verified]
+
+## Boundary
+This report identifies research signals. It does not establish that a project has hired a sign contractor or intends to purchase signage.
